@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Lesson Of Math Knowledge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Poppins',sans-serif; background: linear-gradient(135deg,#0f0c29,#302b63,#24243e); color:#fff; }
+
+        /* Opening */
+        #intro { height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; background: linear-gradient(135deg,#6a11cb,#2575fc); padding:20px; transition: opacity 0.5s ease; }
+        #title { font-size:3rem; font-weight:800; }
+        #subtitle { font-size:1.8rem; margin-top:10px; }
+        #cursor, #cursor2 { display:inline-block; width:10px; animation: blink 0.7s step-end infinite; }
+        @keyframes blink { 50% { opacity:0 } }
+
+        /* Buttons */
+        #btnYes, #btnNo { background:white; color:#333; border:none; padding:12px 28px; margin:10px; font-size:1.2em; border-radius:10px; cursor:pointer; font-weight:600; transition:all 0.5s ease; box-shadow:0 4px 8px rgba(0,0,0,0.2); opacity:0; transform:translateY(20px);}
+        #btnYes.show, #btnNo.show { opacity:1; transform:translateY(0); }
+        #btnYes:hover, #btnNo:hover { background:#ff4081; color:white; transform:scale(1.08); }
+
+        /* Welcome */
+        #welcome { display:none; flex-direction:column; justify-content:center; align-items:center; height:100vh; text-align:center; background:linear-gradient(135deg,#6a11cb,#2575fc); font-size:2.5rem; font-weight:800; color:white; position:relative;}
+        #welcome p { font-size:1rem; margin-top:15px; font-style:italic; opacity:0.9; }
+        #loading { position:relative; margin-top:20px; }
+        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #8c2de9; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin:0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Goodbye */
+        #goodbye { opacity:0; transform:translateY(20px) scale(0.8); font-size:2em; font-weight:700; margin-top:20px; transition:opacity 1s ease, transform 1s ease; pointer-events:none; }
+        #goodbye.show { opacity:1; transform:translateY(0) scale(1); }
+
+        /* Materi */
+        #materi { display:none; animation: fadeIn 1s ease; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+        header { text-align:center; padding:40px 20px; background: linear-gradient(90deg,#6a11cb,#2575fc); box-shadow:0 4px 10px rgba(0,0,0,0.3);}
+        header h1 { font-size:2.5rem; }
+        header p { font-size:1.1rem; margin-top:10px; color:#e0e0e0; }
+
+        nav { display:flex; justify-content:center; margin-top:20px; flex-wrap:wrap; }
+        nav button { background:#2575fc; border:none; color:white; padding:12px 25px; margin:5px; font-weight:600; border-radius:15px; cursor:pointer; transition:0.3s; box-shadow:0 4px 8px rgba(0,0,0,0.2);}
+        nav button:hover { background:#6a11cb; }
+        nav button.active { background:#ff5722; transform:scale(1.05); }
+
+        .container { max-width:1200px; margin:40px auto; padding:0 20px; }
+        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); padding:20px; border-radius:20px; margin-bottom:30px; box-shadow:0 8px 20px rgba(0,0,0,0.3); transition:0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow:0 12px 25px rgba(0,0,0,0.5); }
+        .card h3 { color:#ffeb3b; margin-bottom:15px; }
+        .card ul { list-style: disc; margin-left:20px; margin-bottom:10px; }
+        .card p { margin-bottom:10px; line-height:1.6; }
+
+        .latihan-btn { background:#ff5722; border:none; padding:10px 20px; color:white; border-radius:12px; cursor:pointer; transition:0.3s; font-weight:600; }
+        .latihan-btn:hover { background:#ff9800; }
+
+        footer { text-align:center; padding:20px; background:#1a1a2e; margin-top:40px; color:#bbb; }
+
+        .tab-content { display:none; }
+        .active-tab { display:block; animation:fadeIn 0.8s; }
+
+        /* Quiz Styling */
+        .question-item { background: rgba(255,255,255,0.05); padding:15px; margin-bottom:20px; border-radius:15px; }
+        .question-item label { display:block; margin:5px 0; }
+        .correct { color: #4CAF50; font-weight: bold; }
+        .wrong { color: #F44336; font-weight: bold; }
+
+        /* ---- Modal Styling (Layar Mengambang) ---- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            animation: fadeInModal 0.3s forwards;
+        }
+
+        .modal-content {
+            background-color: #302b63;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.5s forwards;
+            position: relative;
+        }
+
+        @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .close-btn:hover, .close-btn:focus {
+            color: #fff;
+        }
+
+        .modal-content h3 {
+            color: #ffeb3b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .modal-content p {
+            margin-bottom: 10px;
+        }
+        .modal-content ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        .modal-content ul li {
+            padding: 8px 0;
+        }
+        .modal-content button {
+            display: block;
+            margin-top: 20px;
+            width: 100%;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .modal-content button:hover {
+            background-color: #ff9800;
+        }
+        .modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .modal-options label {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal-options label:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .modal-options input[type="radio"] {
+            margin-right: 10px;
+        }
+        .modal-result {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .modal-result p {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .modal-explanation {
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            text-align: left;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="intro">
+    <h1><span id="title"></span><span id="cursor"></span></h1>
+    <p><span id="subtitle"></span><span id="cursor2"></span></p>
+    <img id="illustration" alt="Ilustrasi Belajar" style="width:200px; max-width:50%; margin:20px auto; display:none;">
+    <div>
+      <button id="btnYes" onclick="goToWelcome()">Yes</button>
+      <button id="btnNo" onclick="goodBye()">No</button>
+    </div>
+    <div id="goodbye">Good Bye 👋</div>
+</div>
+
+<div id="welcome">
+    <h1>Welcome To This Knowledge</h1>
+    <p id="motivation">"Belajar hari ini adalah investasi untuk masa depanmu."</p>
+    <div id="loading">
+      <div class="spinner"></div>
+    </div>
+</div>
+
+<div id="materi">
+<header>
+    <h1>The Lesson Of Math Knowledge</h1>
+    <p>Materi Lengkap, Contoh Soal, dan Latihan Interaktif</p>
+</header>
+<nav>
+    <button onclick="openTab('kelas10', this)">Kelas 10</button>
+    <button onclick="openTab('kelas11', this)">Kelas 11</button>
+    <button onclick="openTab('kelas12', this)">Kelas 12</button>
+</nav>
+
+<div class="container">
+
+<div id="kelas10" class="tab-content">
+    <div class="card">
+        <h3>Eksponen & Logaritma</h3>
+        <p><strong>Pengertian:</strong> Eksponen adalah perpangkatan, logaritma invers dari perpangkatan.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>a^m x a^n = a^(m+n)</li><li>(a^m)^n = a^(m x n)</li><li>log_a(xy) = log_a x + log_a y</li></ul>
+        <p><strong>Contoh Soal:</strong> Jika 2^x = 8, maka x = 3</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Eksponen & Logaritma', 'Jika 3^x = 27, tentukan nilai x!', ['x=2','x=3','x=4','x=5'], 'x=3', 'Karena 3^3 = 27, maka nilai x adalah 3.')">Latihan Soal Interaktif</button>
+    </div>
+    <div class="card">
+        <h3>Barisan & Deret</h3>
+        <p><strong>Pengertian:</strong> Barisan adalah urutan bilangan. Deret adalah penjumlahan suku barisan.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>Un = a + (n-1)d</li><li>Sn = n/2 x (a+Un)</li></ul>
+        <p><strong>Contoh Soal:</strong> Barisan 2,5,8,... Tentukan U10 = 29</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Barisan & Deret', 'Tentukan U15 dari barisan 3,7,11,...', ['59','63','67','71'], '59', 'Ini adalah barisan aritmatika dengan suku pertama (a) = 3 dan beda (d) = 4. Rumus suku ke-n: Un = a + (n-1)d. U15 = 3 + (15-1) * 4 = 3 + 14 * 4 = 3 + 56 = 59.')">Latihan Soal Interaktif</button>
+    </div>
+    <div class="card">
+        <h3>Trigonometri Dasar</h3>
+        <p><strong>Pengertian:</strong> Hubungan sudut dan sisi pada segitiga siku-siku.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>sin θ = Opposite/Hypotenuse</li><li>cos θ = Adjacent/Hypotenuse</li><li>tan θ = Opposite/Adjacent</li></ul>
+        <p><strong>Contoh Soal:</strong> Jika sisi tegak = 3, sisi miring = 5 → sin θ = 3/5</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Trigonometri Dasar', 'Hitung cos θ jika sisi tegak=4 dan sisi miring=5', ['4/5','3/5','5/4','1/2'], '3/5', 'Dengan Teorema Pythagoras, sisi samping = √(5²-4²) = √(25-16) = √9 = 3. Maka, cos θ = Sisi Samping / Sisi Miring = 3/5.')">Latihan Soal Interaktif</button>
+    </div>
+    <div class="card">
+        <h3>Fungsi Kuadrat</h3>
+        <p><strong>Pengertian:</strong> Fungsi polinomial pangkat dua berbentuk y=ax^2+bx+c</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>y = ax^2 + bx + c</li><li>x = [-b ± √(b^2-4ac)]/2a</li></ul>
+        <p><strong>Contoh Soal:</strong> y = x^2 -5x +6 → x=2 atau 3</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Fungsi Kuadrat', 'Tentukan x jika y = x^2 - 3x + 2', ['1 dan 2','2 dan 3','0 dan 2','1 dan 3'], '1 dan 2', 'Faktorkan persamaan x²-3x+2=0 menjadi (x-1)(x-2)=0. Solusinya adalah x=1 atau x=2.')">Latihan Soal Interaktif</button>
+    </div>
+    <div class="card">
+        <h3>Statistika Dasar</h3>
+        <p><strong>Pengertian:</strong> Analisis data, mean, median, modus, dan penyebaran.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>Mean = Σx/n</li><li>Median = nilai tengah data urut</li><li>Modus = nilai yang paling sering muncul</li></ul>
+        <p><strong>Contoh Soal:</strong> Data 2,4,4,5,7 → mean=4.4, median=4, modus=4</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Statistika Dasar', 'Hitung mean dari 3,5,7,9,11', ['5','7','6','8'], '7', 'Mean = (3+5+7+9+11) / 5 = 35 / 5 = 7.')">Latihan Soal Interaktif</button>
+    </div>
+    <div class="card">
+        <h3>Geometri Planar</h3>
+        <p><strong>Pengertian:</strong> Bangun datar, keliling, luas, dan sifat-sifatnya.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>Luas segitiga = 1/2 x a x t</li><li>Luas persegi = s x s</li><li>Luas lingkaran = π x r^2</li></ul>
+        <p><strong>Contoh Soal:</strong> Segitiga alas=6, tinggi=4 → Luas=12</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Geometri Planar', 'Hitung luas lingkaran r=7', ['49π','14π','21π','28π'], '49π', 'Luas lingkaran = πr². Luas = π * 7² = 49π.')">Latihan Soal Interaktif</button>
+    </div>
+    <div class="card">
+        <h3>Teori Peluang</h3>
+        <p><strong>Pengertian:</strong> Analisis kemungkinan kejadian.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>P(A) = jumlah kejadian A / jumlah semua kemungkinan</li></ul>
+        <p><strong>Contoh Soal:</strong> Lempar dadu, peluang keluar 3 → 1/6</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Teori Peluang', 'Lempar koin 2x, peluang muncul 2 kepala?', ['1/2','1/3','1/4','1/6'], '1/4', 'Peluang muncul kepala pada satu lemparan adalah 1/2. Karena dua lemparan independen, peluangnya adalah 1/2 * 1/2 = 1/4.')">Latihan Soal Interaktif</button>
+    </div>
+    
+    <div style="text-align:center; margin:30px 0;">
+        <p style="margin-bottom:10px;">Ingin menguji pemahaman seluruh materi di kelas ini?</p>
+        <button id="startQuizBtn-kelas10" class="latihan-btn" onclick="startQuiz('kelas10')">Mulai **Quiz** Kelas 10</button>
+    </div>
+
+    <div id="quizContainer-kelas10" style="display:none; margin-top:40px;">
+        <h2 style="text-align:center; color:#ffeb3b;">Quiz Kelas 10</h2>
+        <div id="quizContent-kelas10"></div>
+        <div id="quizResult-kelas10" style="display:none; text-align:center; margin-top:20px;">
+            <p id="scoreText-kelas10" style="font-size:1.5rem;"></p>
+            <button class="latihan-btn" onclick="showAnswerKeys('kelas10')">Lihat Jalan Jawaban</button>
+            <div id="answerKeys-kelas10" style="margin-top:20px; display:none; text-align:left;"></div>
+        </div>
+    </div>
+</div>
+
+<div id="kelas11" class="tab-content">
+    <div class="card">
+        <h3>Persamaan & Pertidaksamaan Linear Dua Variabel</h3>
+        <p><strong>Pengertian:</strong> Sistem persamaan linear dengan dua variabel yang solusinya dapat direpresentasikan sebagai titik potong garis.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>ax + by = c</li><li>dx + ey = f</li></ul>
+        <p><strong>Contoh Soal:</strong> x+y=5 dan x-y=1 → x=3, y=2</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Sistem Persamaan Linear', 'Tentukan x dan y jika 2x+y=7 dan x-y=2', ['x=3,y=1','x=2,y=3','x=3,y=2','x=1,y=3'], 'x=3,y=1', 'Selesaikan sistem persamaan dengan metode eliminasi atau substitusi. 2x+y=7 dan x-y=2. Jumlahkan kedua persamaan: (2x+y)+(x-y)=7+2 -> 3x=9 -> x=3. Substitusikan x=3 ke x-y=2 -> 3-y=2 -> y=1.')">Latihan Soal Interaktif</button>
+    </div>
+    <div class="card">
+        <h3>Turunan Fungsi</h3>
+        <p><strong>Pengertian:</strong> Turunan (derivatif) mengukur seberapa sensitif perubahan suatu fungsi terhadap perubahan inputnya.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>d/dx(x^n) = n*x^(n-1)</li><li>d/dx(f(x) + g(x)) = f'(x) + g'(x)</li></ul>
+        <p><strong>Contoh Soal:</strong> Turunan dari f(x) = x^2 adalah 2x</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Turunan Fungsi', 'Tentukan turunan dari f(x) = 3x^4', ['12x^3','4x^3','3x^3','12x^4'], '12x^3', 'Gunakan rumus d/dx(ax^n) = a*n*x^(n-1). Turunan dari 3x^4 adalah 3 * 4 * x^(4-1) = 12x^3.')">Latihan Soal Interaktif</button>
+    </div>
+    
+    <div class="card">
+        <h3>Integral Tak Tentu</h3>
+        <p><strong>Pengertian:</strong> Kebalikan dari proses turunan (anti-derivatif).</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>∫x^n dx = (1/(n+1))x^(n+1) + C</li><li>∫(f(x)+g(x)) dx = ∫f(x) dx + ∫g(x) dx</li></ul>
+        <p><strong>Contoh Soal:</strong> ∫2x dx = x^2 + C</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Integral Tak Tentu', 'Tentukan integral tak tentu dari ∫ 3x^2 dx', ['x^3+C','3x^3+C','2x^3+C','6x+C'], 'x^3+C', 'Gunakan rumus ∫ax^n dx = (a/(n+1))x^(n+1) + C. Integral dari 3x^2 adalah (3/(2+1))x^(2+1) + C = (3/3)x^3 + C = x^3 + C.')">Latihan Soal Interaktif</button>
+    </div>
+
+    <div style="text-align:center; margin:30px 0;">
+        <p style="margin-bottom:10px;">Ingin menguji pemahaman seluruh materi di kelas ini?</p>
+        <button id="startQuizBtn-kelas11" class="latihan-btn" onclick="startQuiz('kelas11')">Mulai **Quiz** Kelas 11</button>
+    </div>
+
+    <div id="quizContainer-kelas11" style="display:none; margin-top:40px;">
+        <h2 style="text-align:center; color:#ffeb3b;">Quiz Kelas 11</h2>
+        <div id="quizContent-kelas11"></div>
+        <div id="quizResult-kelas11" style="display:none; text-align:center; margin-top:20px;">
+            <p id="scoreText-kelas11" style="font-size:1.5rem;"></p>
+            <button class="latihan-btn" onclick="showAnswerKeys('kelas11')">Lihat Jalan Jawaban</button>
+            <div id="answerKeys-kelas11" style="margin-top:20px; display:none; text-align:left;"></div>
+        </div>
+    </div>
+</div>
+
+<div id="kelas12" class="tab-content">
+    <div class="card">
+        <h3>Dimensi Tiga (Geometri Ruang)</h3>
+        <p><strong>Pengertian:</strong> Mempelajari objek-objek dalam ruang tiga dimensi, seperti kubus, balok, dan limas.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>Jarak titik ke titik: √((x₂-x₁)² + (y₂-y₁)² + (z₂-z₁)²)</li><li>Volume kubus = s³</li><li>Volume balok = p x l x t</li></ul>
+        <p><strong>Contoh Soal:</strong> Panjang diagonal ruang kubus rusuk 6 cm adalah 6√3 cm</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Dimensi Tiga', 'Tentukan panjang diagonal sisi kubus dengan rusuk 5 cm!', ['5','5√2','5√3','10'], '5√2', 'Panjang diagonal sisi kubus dengan rusuk "s" adalah s√2. Jadi, 5√2 cm.')">Latihan Soal Interaktif</button>
+    </div>
+    
+    <div class="card">
+        <h3>Kaidah Pencacahan</h3>
+        <p><strong>Pengertian:</strong> Menghitung banyaknya cara yang mungkin dari suatu kejadian. Termasuk permutasi dan kombinasi.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>Permutasi: P(n,r) = n! / (n-r)!</li><li>Kombinasi: C(n,r) = n! / (r!(n-r)!)</li></ul>
+        <p><strong>Contoh Soal:</strong> Permutasi 3 dari 5 objek = 5!/(5-3)! = 60</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Kaidah Pencacahan', 'Berapa kombinasi 2 dari 4 objek?', ['4','6','8','12'], '6', 'C(n,r) = n! / (r!(n-r)!). C(4,2) = 4! / (2!(4-2)!) = (4 x 3 x 2 x 1) / ((2 x 1) x (2 x 1)) = 24 / 4 = 6.')">Latihan Soal Interaktif</button>
+    </div>
+
+    <div class="card">
+        <h3>Matriks</h3>
+        <p><strong>Pengertian:</strong> Kumpulan bilangan yang disusun dalam baris dan kolom. Digunakan untuk menyelesaikan sistem persamaan linear.</p>
+        <p><strong>Rumus:</strong></p>
+        <ul><li>Determinan matriks 2x2: ad - bc</li><li>Invers matriks 2x2</li></ul>
+        <p><strong>Contoh Soal:</strong> A=[[1,2],[3,4]] → det(A) = 1*4 - 2*3 = -2</p>
+        <button class="latihan-btn" onclick="showInteractiveModal('Matriks', 'Tentukan determinan matriks [[2,1],[5,3]]', ['1','2','3','-1'], '1', 'Determinan matriks 2x2 [[a,b],[c,d]] adalah ad - bc. Determinan = 2*3 - 1*5 = 6 - 5 = 1.')">Latihan Soal Interaktif</button>
+    </div>
+
+    <div style="text-align:center; margin:30px 0;">
+        <p style="margin-bottom:10px;">Ingin menguji pemahaman seluruh materi di kelas ini?</p>
+        <button id="startQuizBtn-kelas12" class="latihan-btn" onclick="startQuiz('kelas12')">Mulai **Quiz** Kelas 12</button>
+    </div>
+
+    <div id="quizContainer-kelas12" style="display:none; margin-top:40px;">
+        <h2 style="text-align:center; color:#ffeb3b;">Quiz Kelas 12</h2>
+        <div id="quizContent-kelas12"></div>
+        <div id="quizResult-kelas12" style="display:none; text-align:center; margin-top:20px;">
+            <p id="scoreText-kelas12" style="font-size:1.5rem;"></p>
+            <button class="latihan-btn" onclick="showAnswerKeys('kelas12')">Lihat Jalan Jawaban</button>
+            <div id="answerKeys-kelas12" style="margin-top:20px; display:none; text-align:left;"></div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<footer>
+    <p>&copy; 2025 The Lesson Of Math Knowledge. All rights reserved.</p>
+</footer>
+</div>
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle"></h3>
+        <p id="modalQuestion"></p>
+        <div id="modalOptions" class="modal-options"></div>
+        <button id="checkAnswerBtn" onclick="checkAnswer()">Cek Jawaban</button>
+        <div id="modalResult" class="modal-result" style="display: none;">
+            <p id="modalResultText"></p>
+            <div id="modalExplanation" class="modal-explanation"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Typing effect
+document.addEventListener("DOMContentLoaded", () => {
+    const titleText = "The Lesson Of Math Knowledge";
+    const subtitleText = "Are you ready?";
+    let i=0, j=0;
+    function typeWriter(){
+        if(i < titleText.length){
+            document.getElementById("title").innerHTML += titleText.charAt(i);
+            i++; setTimeout(typeWriter, 100);
+        } else { document.getElementById("cursor").style.display="none"; setTimeout(typeSubtitle,500); }
+    }
+    function typeSubtitle(){
+        if(j < subtitleText.length){
+            document.getElementById("subtitle").innerHTML += subtitleText.charAt(j);
+            j++; setTimeout(typeSubtitle,80);
+        } else { document.getElementById("cursor2").style.display="none";
+            setTimeout(()=>{
+                document.getElementById("btnYes").classList.add("show");
+                document.getElementById("btnNo").classList.add("show");
+                document.getElementById("illustration").style.display="block";
+            },600);
+        }
+    }
+    typeWriter();
+
+    const illustrations = [
+        "https://raw.githubusercontent.com/irazasyed/undraw-illustrations/master/education.svg",
+        "https://raw.githubusercontent.com/irazasyed/undraw-illustrations/master/online_learning.svg",
+        "https://raw.githubusercontent.com/irazasyed/undraw-illustrations/master/teaching.svg",
+        "https://raw.githubusercontent.com/irazasyed/undraw-illustrations/master/studying.svg"
+    ];
+    const randomImg = illustrations[Math.floor(Math.random()*illustrations.length)];
+    document.getElementById("illustration").src = randomImg;
+});
+
+const motivationalTexts = [
+    "Belajar hari ini adalah investasi untuk masa depanmu.",
+    "Setiap detik belajar mendekatkanmu pada sukses.",
+    "Pengetahuan adalah kunci untuk membuka kesempatan.",
+    "Jangan pernah berhenti belajar, karena hidup terus berjalan.",
+    "Hari ini kamu belajar, esok kamu menuai hasilnya."
+];
+let motivationInterval;
+
+function goToWelcome() {
+    const intro = document.getElementById("intro");
+    intro.style.opacity = 0;
+    setTimeout(()=>{ intro.style.display="none"; },500);
+    const welcome = document.getElementById("welcome");
+    welcome.style.display="flex";
+    changeMotivation();
+    motivationInterval = setInterval(changeMotivation, 3000);
+    setTimeout(()=>{
+        clearInterval(motivationInterval);
+        welcome.style.display="none";
+        document.getElementById("materi").style.display="block";
+        openTab('kelas10', document.querySelector('nav button:first-child'));
+    },6000);
+}
+
+function changeMotivation() {
+    const p = document.getElementById("motivation");
+    const randomIndex = Math.floor(Math.random() * motivationalTexts.length);
+    p.textContent = `"${motivationalTexts[randomIndex]}"`;
+}
+
+function goodBye() {
+    document.getElementById("title").style.display="none";
+    document.getElementById("subtitle").style.display="none";
+    document.getElementById("btnYes").style.display="none";
+    document.getElementById("btnNo").style.display="none";
+    const goodbye = document.getElementById("goodbye");
+    goodbye.style.display="block";
+    setTimeout(()=>{ goodbye.classList.add("show"); },10);
+    setTimeout(()=>{ window.close(); },2000);
+}
+
+function openTab(tabName, elm) {
+    var i, tabs = document.getElementsByClassName('tab-content');
+    for(i=0;i<tabs.length;i++){ tabs[i].classList.remove('active-tab'); }
+    document.getElementById(tabName).classList.add('active-tab');
+
+    var navButtons = document.querySelectorAll('nav button');
+    navButtons.forEach(btn => btn.classList.remove('active'));
+    if (elm) {
+        elm.classList.add('active');
+    }
+}
+
+// Variabel global untuk menyimpan data soal
+let currentQuestionData = {};
+
+// Fungsi untuk menampilkan modal interaktif
+function showInteractiveModal(title, question, options, answer, explanation) {
+    const modal = document.getElementById('myModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalQuestion = document.getElementById('modalQuestion');
+    const modalOptions = document.getElementById('modalOptions');
+    const modalResult = document.getElementById('modalResult');
+    const modalExplanation = document.getElementById('modalExplanation');
+    const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+
+    // Reset modal
+    modalTitle.textContent = title;
+    modalQuestion.innerHTML = question;
+    modalOptions.innerHTML = '';
+    modalResult.style.display = 'none';
+    modalExplanation.style.display = 'none';
+    checkAnswerBtn.style.display = 'block';
+
+    // Simpan data soal saat ini
+    currentQuestionData = {
+        answer: answer,
+        explanation: explanation
+    };
+
+    // Membangun pilihan jawaban dengan radio button
+    options.forEach((option, index) => {
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="radio" name="modal_q" value="${option}"> ${option}`;
+        modalOptions.appendChild(label);
+    });
+
+    modal.style.display = 'flex';
+}
+
+// Fungsi untuk mengecek jawaban di modal
+function checkAnswer() {
+    const selected = document.querySelector('input[name="modal_q"]:checked');
+    const modalResultText = document.getElementById('modalResultText');
+    const modalExplanation = document.getElementById('modalExplanation');
+
+    if (!selected) {
+        alert('Silakan pilih salah satu jawaban!');
+        return;
+    }
+
+    const userAnswer = selected.value;
+    const correctAnswer = currentQuestionData.answer;
+    const explanation = currentQuestionData.explanation;
+
+    modalResultText.textContent = userAnswer === correctAnswer ? 'Jawaban Anda Benar! 👍' : 'Jawaban Anda Salah. 👎';
+    modalResultText.style.color = userAnswer === correctAnswer ? '#4CAF50' : '#F44336';
+    
+    modalExplanation.innerHTML = `<strong>Penjelasan:</strong><br>${explanation}`;
+    modalExplanation.style.display = 'block';
+    
+    document.getElementById('modalResult').style.display = 'block';
+    document.getElementById('checkAnswerBtn').style.display = 'none';
+
+    // Menonaktifkan semua radio button
+    const radioButtons = document.querySelectorAll('input[name="modal_q"]');
+    radioButtons.forEach(radio => radio.disabled = true);
+}
+
+// Fungsi untuk menutup modal
+function closeModal() {
+    const modal = document.getElementById('myModal');
+    modal.style.display = 'none';
+}
+
+// Quiz Data
+const quizzes = {
+    kelas10: [
+        {question:"Jika 3^x = 81, maka nilai dari x adalah?", options:["2","3","4","5"], answer:"4", explanation:"3^4 = 3 x 3 x 3 x 3 = 81, jadi nilai x adalah 4."},
+        {question:"Tentukan jumlah 5 suku pertama dari deret geometri dengan a=2 dan r=3!", options:["242","121","60","30"], answer:"242", explanation:"Jumlah n suku pertama deret geometri dirumuskan sebagai Sn = a(r^n - 1) / (r-1). Maka S5 = 2(3^5 - 1) / (3-1) = 2(243-1)/2 = 242. Karena a=2, r=3. Suku-sukunya adalah 2, 6, 18, 54, 162. Jumlahnya = 2+6+18+54+162 = 242."},
+        {question:"Jika sin A = 3/5 dan A berada di kuadran I, maka nilai cos A adalah?", options:["3/5","4/5","5/3","1/2"], answer:"4/5", explanation:"Menggunakan Teorema Pythagoras, jika sisi depan = 3 dan sisi miring = 5, maka sisi samping = √(5²-3²) = √(25-9) = √16 = 4. Jadi, cos A = 4/5."},
+        {question:"Tentukan titik puncak dari parabola y = x^2 - 4x + 3!", options:["(2,-1)","(2,1)","(4,3)","(0,3)"], answer:"(2,-1)", explanation:"Koordinat x titik puncak adalah x = -b/(2a) = -(-4)/(2*1) = 4/2 = 2. Substitusikan x=2 ke persamaan: y = 2^2 - 4(2) + 3 = 4 - 8 + 3 = -1. Jadi, titik puncaknya adalah (2,-1)."},
+        {question:"Tentukan median dari data: 10, 8, 12, 14, 11!", options:["10","11","12","14"], answer:"11", explanation:"Urutkan data terlebih dahulu: 8, 10, 11, 12, 14. Karena jumlah data ganjil, median adalah nilai tengah, yaitu 11."},
+        {question:"Sebuah kubus memiliki rusuk 5 cm. Hitunglah luas permukaannya!", options:["125 cm²","150 cm²","100 cm²","25 cm²"], answer:"150 cm²", explanation:"Rumus luas permukaan kubus adalah 6s². Jadi, 6 x 5² = 6 x 25 = 150 cm²."},
+        {question:"Sebuah dadu dilempar satu kali. Berapa peluang munculnya mata dadu genap?", options:["1/6","1/3","1/2","2/3"], answer:"1/2", explanation:"Mata dadu genap adalah 2, 4, dan 6 (3 kemungkinan). Total kemungkinan adalah 6. Jadi, peluangnya adalah 3/6 = 1/2."}
+    ],
+    kelas11: [
+        {question:"Sistem persamaan 2x+y=7 dan x+y=4. Tentukan nilai x!", options:["1","2","3","4"], answer:"3", explanation:"Dengan metode eliminasi, kurangkan persamaan kedua dari yang pertama: (2x+y) - (x+y) = 7-4 -> x=3. Substitusikan ke persamaan kedua: 3+y=4 -> y=1. Nilai x adalah 3."},
+        {question:"Tentukan turunan pertama dari fungsi f(x) = 2x^3 - 5x + 1!", options:["6x^2-5","3x^2-5","2x^2-5","6x^3-5x"], answer:"6x^2-5", explanation:"Gunakan aturan turunan pangkat: d/dx(ax^n) = anx^(n-1). Turunan dari 2x^3 adalah 2(3)x^(3-1) = 6x^2. Turunan dari -5x adalah -5. Turunan dari 1 adalah 0. Jadi, turunannya 6x^2-5. "},
+        {question:"Tentukan hasil dari ∫ (4x^3 + 2) dx!", options:["x^4+2x+C","x^4+C","4x^4+2x+C","x^3+2x+C"], answer:"x^4+2x+C", explanation:"Gunakan rumus integral: ∫ax^n dx = (a/(n+1))x^(n+1) + C. Integral dari 4x^3 adalah (4/4)x^4 = x^4. Integral dari 2 adalah 2x. Hasilnya adalah x^4 + 2x + C."}
+    ],
+    kelas12: [
+        {question:"Sebuah kubus ABCD.EFGH memiliki rusuk 10 cm. Tentukan jarak titik A ke titik G!", options:["10 cm","10√2 cm","10√3 cm","20 cm"], answer:"10√3 cm", explanation:"Jarak titik A ke G adalah panjang diagonal ruang kubus. Rumusnya adalah s√3, di mana s adalah panjang rusuk. Jadi, 10√3 cm."},
+        {question:"Dari 7 orang calon pengurus OSIS, akan dipilih ketua, wakil, dan sekretaris. Berapa banyak susunan yang mungkin?", options:["210","840","35","5040"], answer:"210", explanation:"Ini adalah permutasi karena urutan (ketua, wakil, sekretaris) penting. Gunakan rumus P(n,r) = n! / (n-r)!. P(7,3) = 7! / (7-3)! = 7!/4! = 7 x 6 x 5 = 210."},
+        {question:"Jika matriks A = [[3,2],[1,4]], tentukan determinan dari matriks A!", options:["10","8","6","-10"], answer:"10", explanation:"Determinan matriks 2x2 [[a,b],[c,d]] adalah ad - bc. Determinan A = (3)(4) - (2)(1) = 12 - 2 = 10."}
+    ]
+};
+
+function startQuiz(className) {
+    document.querySelectorAll('[id^="quizContainer-"]').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('[id^="quizResult-"]').forEach(el => el.style.display = 'none');
+
+    const container = document.getElementById(`quizContent-${className}`);
+    const quizData = quizzes[className];
+    container.innerHTML = "";
+
+    quizData.forEach((q, i) => {
+        let html = `<div class="question-item">
+            <p><strong>${i+1}. ${q.question}</strong></p>`;
+        q.options.forEach(opt => {
+            html += `<label style="display:block; margin:5px 0;">
+                <input type="radio" name="q${className}-${i}" value="${opt}"> ${opt}
+            </label>`;
+        });
+        html += `</div>`;
+        container.innerHTML += html;
+    });
+
+    container.innerHTML += `<div style="text-align:center;">
+        <button class="latihan-btn" onclick="submitQuiz('${className}')">Submit Jawaban</button>
+    </div>`;
+
+    document.getElementById(`quizContainer-${className}`).style.display="block";
+}
+
+function submitQuiz(className) {
+    let score = 0;
+    const quizData = quizzes[className];
+    
+    quizData.forEach((q, i) => {
+        const selected = document.querySelector(`input[name=q${className}-${i}]:checked`);
+        const questionItem = selected ? selected.closest('.question-item') : null;
+
+        if (selected) {
+            if (selected.value === q.answer) {
+                score++;
+                if (questionItem) questionItem.style.border = '2px solid #4CAF50';
+            } else {
+                if (questionItem) questionItem.style.border = '2px solid #F44336';
+            }
+        } else {
+             if (questionItem) questionItem.style.border = '2px solid #F44336';
+        }
+    });
+
+    document.getElementById(`quizResult-${className}`).style.display="block";
+    document.getElementById(`scoreText-${className}`).textContent = `Nilai Anda: ${score} / ${quizData.length}`;
+}
+
+function showAnswerKeys(className) {
+    const keysDiv = document.getElementById(`answerKeys-${className}`);
+    const quizData = quizzes[className];
+    keysDiv.innerHTML = "";
+    quizData.forEach((q, i) => {
+        keysDiv.innerHTML += `<p><strong>${i+1}. ${q.question}</strong><br>
+            Jawaban: ${q.answer}<br>
+            Penjelasan: ${q.explanation}</p><hr>`;
+    });
+    keysDiv.style.display="block";
+}
+</script>
+
+</body>
+</html>
